@@ -17,34 +17,28 @@ app.get('/map', (req, res) => {
 app.get('/pdf', async (req, res) => {
     try {
         const { course_id, prnds } = req.query
-        console.log('course_id, prnds', course_id, prnds)
+        console.log({ course_id, prnds })
 
-        // PUPPETEER
         const browser = await puppeteer.launch()
         const page = await browser.newPage()
         await page.goto('http://localhost:3000/map')
-
-
         await page.waitForSelector('.loaded')
         const mapDataUrl = await page.evaluate(() => {
-            return map.getCanvas().toDataURL().split(',')[1]
-            // return map.getCanvas().toDataURL()
+            return map.getCanvas().toDataURL()
         })
+
+        // uncomment for debugging
         // console.log('mapDataUrl', mapDataUrl)
-        await page.screenshot({path: 'example.png'})
+        // await page.screenshot({path: 'example.png'})
 
         const doc = new PDFDocument
         doc.pipe(fs.createWriteStream('map.pdf'))
-        // var buf = Buffer.from(mapDataUrl, 'base64')
-        // doc.image(buf)
-
-
-        doc.image(mapDataUrl) // creates a blank pdf?
+        doc.image(mapDataUrl)
         doc.end()
 
         await browser.close()
-        return res.sendStatus(200)
-    } catch (err) {
+        return res.sendStatus(201)
+    } catch(err) {
         console.log(err)
         return res.sendStatus(500)
     }
