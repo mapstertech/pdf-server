@@ -33,11 +33,13 @@ app.get('/pdf', async (req, res) => {
         // console.log('mapDataUrl', mapDataUrl)
         await page.screenshot({path: 'example.png'})
 
-        var buf = Buffer.from(mapDataUrl, 'base64')
         const doc = new PDFDocument
         doc.pipe(fs.createWriteStream('map.pdf'))
-        doc.image(buf)
-        // creates a blank
+        // var buf = Buffer.from(mapDataUrl, 'base64')
+        // doc.image(buf)
+
+
+        doc.image(mapDataUrl) // creates a blank pdf?
         doc.end()
 
         await browser.close()
